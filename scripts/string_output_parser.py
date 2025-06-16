@@ -25,8 +25,8 @@ def st_out_parser():
         model = 'gpt-4o',
         temperature = 0.2
     )
-    # Construimos la cadena
 
+    # Construimos la cadena
     chain = prompt_template | model | parser
 
     response = chain.invoke({
