@@ -1,3 +1,9 @@
-requests
-pandas
-pyyaml
+python-dotenv
+
+transformers
+langchain-huggingface
+langchain-openai
+langchain-google-genai
+
+chromadb
+pinecone
