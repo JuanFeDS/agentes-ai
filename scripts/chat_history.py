@@ -2,7 +2,7 @@
 from dotenv import load_dotenv
 
 from langchain_openai import ChatOpenAI
-from langchain.schema import HumanMessage, SystemMessage
+from langchain.schema import HumanMessage, SystemMessage, AIMessage
 
 load_dotenv()
 
@@ -33,4 +33,4 @@ def message_history():
         response = model.invoke(chat_history).content
         print(response)
 
-        chat_history.append(response)
+        chat_history.append(AIMessage(content=response))
