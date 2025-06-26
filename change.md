@@ -4,6 +4,31 @@ Este archivo documenta todos los cambios realizados en el proyecto MetaAgent, si
 
 ---
 
+## [0.4.0] - 2025-06-25
+
+### Implementación de Generación de Agentes con OpenAI
+- **Autor**: Sistema
+- **Descripción**: Integración con la API de OpenAI para generación automática de código de agentes
+- **Detalles Técnicos**:
+  - Implementación de `AgentBuilder` para generar código usando OpenAI
+  - Sistema de evaluación simplificado para validar agentes generados
+  - Script principal `run.py` para la creación y evaluación de agentes
+  - Soporte para diferentes tipos de agentes (analytics, asistente, etc.)
+
+### Archivos Creados/Modificados
+- `run.py`: Script principal para crear y evaluar agentes
+- `core/builder/agent_builder.py`: Implementación del constructor de agentes con OpenAI
+- `core/evaluation/result.py`: Mejoras en el manejo de resultados de evaluación
+- `CHANGELOG.md`: Registro detallado de cambios
+
+### Mejoras Técnicas
+- Manejo mejorado de codificación UTF-8 en Windows
+- Validación de estructura de agentes generados
+- Sistema de puntuación automática de calidad
+- Documentación actualizada
+
+---
+
 ## [0.3.0] - 2025-06-25
 
 ### Refactorización y Mejora de Estructura
