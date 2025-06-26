@@ -4,6 +4,37 @@ Este archivo documenta todos los cambios realizados en el proyecto MetaAgent, si
 
 ---
 
+## [0.3.0] - 2025-06-25
+
+### Refactorización y Mejora de Estructura
+- **Autor**: Sistema
+- **Descripción**: Refactorización mayor del código para mejorar la modularidad y mantenibilidad
+- **Detalles Técnicos**:
+  - Reorganización del código en módulos más pequeños y enfocados
+  - Mejora del manejo de errores con excepciones personalizadas
+  - Documentación completa de todas las clases y métodos
+  - Implementación de pruebas unitarias básicas
+
+### Archivos Creados/Modificados
+- `core/evaluation/__init__.py`: Paquete de evaluación de agentes
+- `core/evaluation/result.py`: Clase para manejar resultados de evaluación
+- `core/evaluation/evaluator.py`: Clase principal de evaluación
+- `core/evaluation/llm_evaluator.py`: Integración con modelos de lenguaje
+- `core/evaluation/exceptions.py`: Excepciones personalizadas
+- `core/agents/__init__.py`: Paquete de agentes
+- `core/agents/agent_loader.py`: Utilidades para cargar agentes dinámicamente
+- `core/agents/base_agent.py`: Clase base para todos los agentes
+- `utils/logger.py`: Utilidades de registro
+- `utils/file_utils.py`: Utilidades para manejo de archivos
+
+### Mejoras Técnicas
+- Separación clara de responsabilidades entre módulos
+- Mejor manejo de la codificación de caracteres
+- Sistema de logging unificado
+- Código más mantenible y testeable
+
+---
+
 ## [0.2.0] - 2025-06-25
 
 ### Estructura de Directorios Creada
