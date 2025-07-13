@@ -1,25 +1,19 @@
 """A simple example of using HuggingFacePipeline to generate text."""
 from langchain_huggingface.llms import HuggingFacePipeline
 
-from src.utils.logger.logger import get_logger
-logger   = get_logger(__name__)
-
-def basic_gen_text():
+def basic_gen_text(model_id: str, task: str, prompt: str, max_tokens: int) -> str:
     """
     Example of using HuggingFacePipeline to generate text with a pre-trained model.
     """
 
-    logger.info('Running HuggingFace text generation example...')
     hf = HuggingFacePipeline.from_model_id(
-        model_id = 'gpt2',
-        task = 'text-generation',
+        model_id = model_id,
+        task = task,
         pipeline_kwargs = {
-            'max_new_tokens': 30
+            'max_new_tokens': max_tokens
         }
     )
-    logger.info('HuggingFacePipeline initialized.')
 
-    prompt = input('Enter your prompt: ')
     response = hf.invoke(prompt)
 
-    print(response)
+    return response
