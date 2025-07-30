@@ -8,7 +8,7 @@ from langchain_core.output_parsers import JsonOutputParser
 
 load_dotenv()
 
-def json_parser():
+def json_parser(prompt_user: str):
     """Script to demonstrate the use of JsonOutputParser with LangChain"""
 
     parser = JsonOutputParser()
@@ -29,9 +29,8 @@ def json_parser():
         temperature = 0.5
     )
 
-
     chain = prompt | model | parser
 
-    response = chain.invoke({'query': 'Qué es el universo?'})
+    response = chain.invoke({'query': prompt_user})
 
-    print(response)
+    return response

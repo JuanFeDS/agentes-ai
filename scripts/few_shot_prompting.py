@@ -6,8 +6,18 @@ from langchain_openai import ChatOpenAI
 
 load_dotenv()
 
-def few_shot_prompt():
-    """f"""
+def few_shot_prompt(prompt: str) -> str:
+    """
+    Script where few shot prompting is used. In this example, 
+    we are using a few examples to help the model understand 
+    the task.
+    
+    Args:
+        prompt(str): The input prompt for the model.
+    
+    Returns:
+        str: The generated text response from the model.
+    """
 
     # Construcción del prompt template
     examples = [
@@ -40,7 +50,7 @@ def few_shot_prompt():
 
     chain = main_prompt | model
     response = chain.invoke({
-        'input': 'Cuánto es 2 😎 9?'
+        'input': prompt
     }).content
 
-    print(response)
+    return response

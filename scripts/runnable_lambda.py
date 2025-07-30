@@ -8,7 +8,7 @@ from langchain_core.runnables import RunnableLambda
 
 load_dotenv()
 
-def runnable_lambda():
+def runnable_lambda(prompt_user: str) -> str:
     """Script where runnables are defined"""
 
     clean_text = RunnableLambda(
@@ -33,4 +33,5 @@ def runnable_lambda():
     )
 
     chain = clean_text | prompt | model | parser | a_dict
-    print(chain.invoke('Qué es el universo?'))
+    response = (chain.invoke(prompt_user))
+    return response

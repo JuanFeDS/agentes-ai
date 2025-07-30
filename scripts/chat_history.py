@@ -22,7 +22,11 @@ def message_history():
         )
         chat_history.append(system_message)
 
-    while True:
+    iterations = 5
+
+    while iterations > 0:
+        iterations -= 1
+        
         query = input('')
         chat_history.append(
             HumanMessage(
@@ -32,5 +36,6 @@ def message_history():
 
         response = model.invoke(chat_history).content
         print(response)
+        print('-------------------')
 
         chat_history.append(AIMessage(content=response))

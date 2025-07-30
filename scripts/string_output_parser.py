@@ -8,8 +8,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def st_out_parser():
-    """Function to parser the model output"""
+def st_out_parser(text: str, language: str) -> str:
+    """
+    Function to parser the model output
+    
+    Args:
+        text(str): The input text to be parsed.
+        language(str): The language to translate the text to.
+    
+    Returns:
+        str: The parsed text.
+    """
 
     # Definimos la plantilla
     prompt_template = ChatPromptTemplate([
@@ -17,21 +26,21 @@ def st_out_parser():
         ('human', '{text}')
     ])
 
-    # Configuramos el parser para el output
-    parser = StrOutputParser()
-
     # Inicializamos el modelo
     model = ChatOpenAI(
         model = 'gpt-4o',
         temperature = 0.2
     )
 
+    # Configuramos el parser para el output
+    parser = StrOutputParser()
+
     # Construimos la cadena
     chain = prompt_template | model | parser
 
     response = chain.invoke({
-        'language': 'italiano',
-        'text': 'Hola, mundo!'
+        'language': language,
+        'text': text
     })
 
-    print(response)
+    return response
