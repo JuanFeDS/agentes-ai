@@ -17,7 +17,7 @@ def run():
     # message_history() # Almacena el historial de conversación
     # runnable_lambda() # Agregar una función personalizada como runnable
     # json_parser() # Devuelve la respuesta en formato JSON
-    asyncio.run(streaming_chat())
+    asyncio.run(streaming_chat('Hola, mundo!'))
 
 if __name__ == '__main__':
     run()
