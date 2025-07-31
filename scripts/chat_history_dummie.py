@@ -6,7 +6,7 @@ from langchain.schema import HumanMessage, SystemMessage, AIMessage
 
 load_dotenv()
 
-def message_history():
+def dummie_message_history():
     """Script where chat history is kept"""
 
     model = ChatOpenAI(
