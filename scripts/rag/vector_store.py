@@ -18,7 +18,7 @@ class VectorStore():
         """
         self.collection_name = collection_name
         self.persist_directory = persist_directory
-        self.embeddings = OpenAIEmbeddings(model='text-embedding-3-large')
+        self.embedding = OpenAIEmbeddings(model='text-embedding-3-large')
         self.vector_store = self._initialize_vector_store()
 
     def _initialize_vector_store(self):
@@ -29,7 +29,7 @@ class VectorStore():
         """
         return Chroma(
             collection_name=self.collection_name,
-            embedding_function=self.embeddings,
+            embedding_function=self.embedding,
             persist_directory=self.persist_directory
         )
 
