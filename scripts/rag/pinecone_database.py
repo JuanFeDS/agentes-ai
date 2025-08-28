@@ -12,9 +12,10 @@ from langchain_pinecone import PineconeVectorStore
 
 load_dotenv()
 
-def pinecone():
+def pinecone_vectorstore():
     """Create a vector store using Pinecone"""
 
+    # Variables globales
     index_name = os.getenv('INDEX_NAME')
 
     # 1. Cargar texto como Document
@@ -55,4 +56,4 @@ def pinecone():
         print("-" * 50)
 
 if __name__ == '__main__':
-    pinecone()
+    pinecone_vectorstore()
