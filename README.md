@@ -69,6 +69,10 @@ python run.py
 └── run.py            # Punto de entrada principal
 ```
 
+## 🕸️ LangGraph
+
+La carpeta [`langgraph/`](./langgraph/) tiene notebooks (grafos, agentes, mensajes, RAG, structured output y tools) y agentes construidos con LangGraph: conversación, extracción, reservas y soporte. Es un proyecto independiente con su propio `pyproject.toml` (uv).
+
 ## 📚 Recursos
 
 - [Documentación de LangChain](https://python.langchain.com/)
