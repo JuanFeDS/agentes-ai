@@ -73,6 +73,19 @@ python run.py
 
 La carpeta [`langgraph/`](./langgraph/) tiene notebooks (grafos, agentes, mensajes, RAG, structured output y tools) y agentes construidos con LangGraph: conversación, extracción, reservas y soporte. Es un proyecto independiente con su propio `pyproject.toml` (uv).
 
+## 🧪 Proyectos
+
+La carpeta [`proyectos/`](./proyectos/) reúne los experimentos de agentes de 2025, cada uno independiente y con sus propias dependencias. Los que tenían historial lo conservan.
+
+| Proyecto | Qué hace | Stack |
+|---|---|---|
+| [`metaagent`](./proyectos/metaagent/) | Genera agentes a partir de especificaciones declarativas: código, empaquetado y evaluación básica | Pydantic · OpenAI |
+| [`aistract`](./proyectos/aistract/) | Resume y analiza papers académicos | LangChain · OpenAI · web |
+| [`infoagent`](./proyectos/infoagent/) | Ingesta periódica de papers desde la API de arXiv a un repositorio local en JSON | Python · Docker |
+| [`next_page`](./proyectos/next_page/) | Prototipo de agentes con memoria conversacional en disco | LangChain · uv |
+| [`crewai`](./proyectos/crewai/) | Plantillas de crewAI: `hello_crewai`, `guide_creator` (Flow) y `new_project` | crewAI · uv |
+| [`langchain`](./proyectos/langchain/) | Laboratorio de LangChain y LangGraph: conceptos, tutoriales, agentes (como `pokeagent`) y plan de estudio | LangChain · LangGraph · uv |
+
 ## 📚 Recursos
 
 - [Documentación de LangChain](https://python.langchain.com/)
