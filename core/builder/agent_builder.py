@@ -2,55 +2,24 @@
 Módulo principal para la construcción de agentes.
 
 Este módulo proporciona la funcionalidad principal para generar agentes
-a partir de especificaciones dadas usando la API de OpenAI.
+a partir de especificaciones dadas, utilizando servicios de generación de código.
 """
 
 import os
-import json
-import openai
-from typing import Dict, Any, Optional
 from pathlib import Path
-from dotenv import load_dotenv
+from typing import Optional
 from openai import OpenAI
 
-from pydantic import BaseModel, Field
-
-# Cargar variables de entorno
-load_dotenv()
-
-# Configurar la API de OpenAI
-api_key = os.getenv("OPENAI_API_KEY")
-if not api_key:
-    raise ValueError("OPENAI_API_KEY no está configurada en las variables de entorno")
-
-# Inicializar el cliente de OpenAI
-client = OpenAI(api_key=api_key)
-
-
-class AgentSpecification(BaseModel):
-    """Especificación para la creación de un agente."""
-    
-    name: str = Field(..., description="Nombre único del agente")
-    description: str = Field(..., description="Descripción detallada del agente")
-    agent_type: str = Field(
-        default="base",
-        description="Tipo de agente a crear (base, reactive, learning, etc.)"
-    )
-    requirements: list[str] = Field(
-        default_factory=list,
-        description="Lista de dependencias requeridas"
-    )
-    config: Dict[str, Any] = Field(
-        default_factory=dict,
-        description="Configuración específica del agente"
-    )
+from .agent_spec import AgentSpecification
+from .code_generator import CodeGenerator
+from .code_validator import CodeValidator
 
 
 class AgentBuilder:
     """Constructor de agentes.
     
-    Esta clase se encarga de generar el código fuente de un agente
-    a partir de una especificación dada.
+    Esta clase orquesta el proceso de generación de un agente,
+    coordinando la generación de código, validación y creación de archivos.
     """
     
     def __init__(self, output_dir: str = "agents"):
@@ -61,6 +30,22 @@ class AgentBuilder:
         """
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
+        
+        # Configurar cliente de OpenAI
+        self._setup_openai()
+        
+        # Inicializar servicios
+        self.code_generator = CodeGenerator(self.client)
+        self.validator = CodeValidator()
+    
+    def _setup_openai(self) -> None:
+        """Configura el cliente de OpenAI."""
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            raise ValueError(
+                "OPENAI_API_KEY no está configurada en las variables de entorno"
+            )
+        self.client = OpenAI(api_key=api_key)
     
     def build(self, spec: AgentSpecification) -> Path:
         """Construye un agente a partir de una especificación.
@@ -69,85 +54,79 @@ class AgentBuilder:
             spec: Especificación del agente a construir
             
         Returns:
-            Ruta al archivo principal del agente generado
-        """
-        # Crear directorio para el agente
-        agent_dir = self.output_dir / spec.name.lower().replace(" ", "_")
-        agent_dir.mkdir(exist_ok=True)
-        
-        # Crear archivo principal del agente
-        agent_file = agent_dir / f"{spec.name.lower().replace(' ', '_')}.py"
-        
-        # Generar código del agente (esto se implementará más adelante)
-        agent_code = self._generate_agent_code(spec)
-        
-        # Escribir el archivo
-        with open(agent_file, 'w', encoding='utf-8') as f:
-            f.write(agent_code)
-        
-        # Crear requirements.txt si hay dependencias
-        if spec.requirements:
-            with open(agent_dir / 'requirements.txt', 'w', encoding='utf-8') as f:
-                f.write('\n'.join(spec.requirements))
-        
-        return agent_file
-    
-    def _generate_agent_code(self, spec: AgentSpecification) -> str:
-        """Genera el código fuente del agente usando la API de OpenAI.
-        
-        Args:
-            spec: Especificación del agente
-            
-        Returns:
-            Código fuente del agente generado por la API
+            Path: Ruta al archivo principal del agente generado
             
         Raises:
-            RuntimeError: Si hay un error al generar el código con la API
+            ValueError: Si hay errores en la generación o validación
+            RuntimeError: Si hay errores de E/S
         """
-        # Crear el prompt para la API de OpenAI
-        prompt = f"""
-        Necesito que generes el código Python para un agente de IA con las siguientes especificaciones:
-        
-        Nombre: {spec.name}
-        Tipo: {spec.agent_type}
-        Descripción: {spec.description}
-        
-        Requisitos: {', '.join(spec.requirements) if spec.requirements else 'Ninguno'}
-        Configuración: {json.dumps(spec.config, indent=2) if spec.config else 'Ninguna'}
-        
-        El código debe incluir:
-        1. Una clase principal con el nombre del agente (usando notación PascalCase)
-        2. Métodos relevantes según el tipo de agente
-        3. Documentación adecuada
-        4. Manejo de errores básico
-        5. Un ejemplo de uso en el bloque if __name__ == "__main__"
-        
-        Por favor, devuelve SOLO el código Python sin marcas de código o explicaciones adicionales.
-        """
-        
         try:
-            response = client.chat.completions.create(
-                model="gpt-4",
-                messages=[
-                    {"role": "system", "content": "Eres un asistente experto en programación Python que genera código de agentes de IA. Genera SOLO el código Python sin explicaciones adicionales."},
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0.3,
-                max_tokens=2000
-            )
+            # 1. Generar el código del agente
+            agent_code = self.code_generator.generate_agent_code(spec)
             
-            # Extraer y limpiar el código generado
-            code = response.choices[0].message.content.strip()
+            # 2. Validar el código generado
+            self.validator.validate_syntax(agent_code)
             
-            # Eliminar marcas de código si existen
-            if code.startswith('```python'):
-                code = code[9:].strip()
-            if code.startswith('```'):
-                code = code[3:].strip()
-            if code.endswith('```'):
-                code = code[:-3].strip()
-                
-            return code
+            # 3. Limpiar el código
+            clean_code = self.validator.clean_generated_code(agent_code)
+            
+            # 4. Crear directorio para el agente
+            agent_dir = self._create_agent_directory(spec.name)
+            
+            # 5. Guardar el código del agente
+            agent_file = self._save_agent_code(agent_dir, spec.name, clean_code)
+            
+            # 6. Guardar requirements.txt si es necesario
+            self._save_requirements(agent_dir, spec.requirements)
+            
+            return agent_file
             
         except Exception as e:
-            raise RuntimeError(f"Error al generar el código del agente con la API de OpenAI: {str(e)}")
+            raise RuntimeError(f"Error al construir el agente: {str(e)}")
+    
+    def _create_agent_directory(self, agent_name: str) -> Path:
+        """Crea el directorio para el agente.
+        
+        Args:
+            agent_name: Nombre del agente
+            
+        Returns:
+            Path: Ruta al directorio del agente
+        """
+        agent_dir = self.output_dir / agent_name.lower().replace(" ", "_")
+        agent_dir.mkdir(exist_ok=True, parents=True)
+        return agent_dir
+    
+    def _save_agent_code(self, agent_dir: Path, agent_name: str, code: str) -> Path:
+        """Guarda el código del agente en un archivo.
+        
+        Args:
+            agent_dir: Directorio del agente
+            agent_name: Nombre del agente
+            code: Código a guardar
+            
+        Returns:
+            Path: Ruta al archivo guardado
+        """
+        agent_file = agent_dir / f"{agent_name.lower().replace(' ', '_')}.py"
+        try:
+            with open(agent_file, 'w', encoding='utf-8') as f:
+                f.write(code)
+            return agent_file
+        except IOError as e:
+            raise RuntimeError(f"Error al guardar el archivo del agente: {str(e)}")
+    
+    def _save_requirements(self, agent_dir: Path, requirements: list[str]) -> None:
+        """Guarda los requisitos en un archivo requirements.txt si es necesario.
+        
+        Args:
+            agent_dir: Directorio del agente
+            requirements: Lista de dependencias
+        """
+        if requirements:
+            try:
+                with open(agent_dir / 'requirements.txt', 'w', encoding='utf-8') as f:
+                    f.write('\n'.join(requirements))
+            except IOError as e:
+                # No es crítico si no se pueden guardar los requisitos
+                print(f"Advertencia: No se pudieron guardar los requisitos: {str(e)}")

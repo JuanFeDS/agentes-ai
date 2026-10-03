@@ -1,0 +1,142 @@
+{
+    "name": "HabitTracker",
+    "description": "Agente para el seguimiento y análisis de hábitos personales. Permite registrar, monitorear y analizar el progreso de hábitos diarios, semanales y mensuales.",
+    "agent_type": "productivity",
+    "requirements": [
+        "pandas>=1.3.0",
+        "matplotlib>=3.4.0",
+        "python-dateutil>=2.8.2"
+    ],
+    "config": {
+        "version": "1.0.0",
+        "storage": "json",
+        "timezone": "UTC"
+    },
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "habit_name": {
+                "type": "string",
+                "description": "Nombre del hábito a registrar o consultar"
+            },
+            "date": {
+                "type": "string",
+                "format": "date",
+                "description": "Fecha del registro en formato YYYY-MM-DD"
+            },
+            "status": {
+                "type": "string",
+                "enum": ["completed", "skipped", "failed"],
+                "description": "Estado del hábito para la fecha especificada"
+            },
+            "notes": {
+                "type": "string",
+                "description": "Notas adicionales sobre el hábito"
+            }
+        },
+        "required": ["habit_name", "date", "status"]
+    },
+    "output_schema": {
+        "type": "object",
+        "properties": {
+            "success": {
+                "type": "boolean",
+                "description": "Indica si la operación fue exitosa"
+            },
+            "message": {
+                "type": "string",
+                "description": "Mensaje descriptivo del resultado"
+            },
+            "data": {
+                "type": ["object", "array"],
+                "description": "Datos resultantes de la operación"
+            }
+        }
+    },
+    "examples": [
+        {
+            "description": "Registrar un hábito completado",
+            "input": {
+                "habit_name": "Ejercicio",
+                "date": "2025-06-26",
+                "status": "completed",
+                "notes": "30 minutos de correr"
+            },
+            "output": {
+                "success": true,
+                "message": "Hábito registrado exitosamente",
+                "data": {
+                    "habit_id": "ex123",
+                    "habit_name": "Ejercicio",
+                    "date": "2025-06-26",
+                    "status": "completed"
+                }
+            }
+        },
+        {
+            "description": "Obtener estadísticas de un hábito",
+            "input": {
+                "habit_name": "Ejercicio",
+                "action": "get_stats",
+                "period": "month"
+            },
+            "output": {
+                "success": true,
+                "message": "Estadísticas obtenidas",
+                "data": {
+                    "habit_name": "Ejercicio",
+                    "period": "2025-06",
+                    "total_days": 26,
+                    "completed": 20,
+                    "success_rate": 76.92
+                }
+            }
+        }
+    ],
+    "methods": [
+        {
+            "name": "add_habit",
+            "description": "Agrega un nuevo hábito al sistema",
+            "parameters": [
+                {"name": "name", "type": "str", "description": "Nombre del hábito"},
+                {"name": "description", "type": "str", "description": "Descripción del hábito"},
+                {"name": "frequency", "type": "str", "description": "Frecuencia del hábito (daily, weekly, monthly)", "default": "daily"}
+            ],
+            "returns": "Dict con el resultado de la operación"
+        },
+        {
+            "name": "record_habit",
+            "description": "Registra el estado de un hábito para una fecha específica",
+            "parameters": [
+                {"name": "habit_name", "type": "str", "description": "Nombre del hábito"},
+                {"name": "date", "type": "str", "description": "Fecha en formato YYYY-MM-DD"},
+                {"name": "status", "type": "str", "description": "Estado del hábito (completed, skipped, failed)"},
+                {"name": "notes", "type": "str", "description": "Notas adicionales", "default": ""}
+            ],
+            "returns": "Dict con el resultado de la operación"
+        },
+        {"name": "get_habits",
+         "description": "Obtiene la lista de hábitos registrados",
+         "parameters": [],
+         "returns": "Lista de hábitos"
+        },
+        {
+            "name": "get_habit_stats",
+            "description": "Obtiene estadísticas de un hábito para un período específico",
+            "parameters": [
+                {"name": "habit_name", "type": "str", "description": "Nombre del hábito"},
+                {"name": "period", "type": "str", "description": "Período (week, month, year)", "default": "month"}
+            ],
+            "returns": "Dict con las estadísticas del hábito"
+        },
+        {
+            "name": "generate_report",
+            "description": "Genera un informe visual del progreso de los hábitos",
+            "parameters": [
+                {"name": "output_file", "type": "str", "description": "Ruta del archivo de salida"},
+                {"name": "period", "type": "str", "description": "Período del informe (week, month, year)", "default": "month"}
+            ],
+            "returns": "Ruta al archivo de informe generado"
+        }
+    ]
+}
