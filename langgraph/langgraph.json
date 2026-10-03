@@ -1,11 +1,15 @@
 {
     "dependencies": ["."],
     "graphs": {
-        "agent": "./src/agents/main.py:agent",
-        "simple": "./src/agents/simple.py:agent",
-        "simple_llm": "./src/agents/simple_llm.py:agent",
-        "simple_chat": "./src/agents/simple_chat.py:agent",
-        "simple_rag": "./src/agents/simple_rag.py:agent"
+        "agent": "./src/agents/first_agents/main.py:agent",
+        "simple": "./src/agents/first_agents/simple.py:agent",
+        "simple_llm": "./src/agents/first_agents/simple_llm.py:agent",
+        "simple_chat": "./src/agents/first_agents/simple_chat.py:agent",
+        "simple_rag": "./src/agents/first_agents/simple_rag.py:agent",
+        "simple_chaining": "./src/agents/first_agents/simple_chaining.py:agent",
+        "simple_schema": "./src/agents/first_agents/simple_schema.py:agent",
+        "support": "./src/agents/support/agent.py:agent",
+        "booking": "./src/agents/support/nodes/booking/node.py:booking_node"
     },
     "env": ".env"
 }
