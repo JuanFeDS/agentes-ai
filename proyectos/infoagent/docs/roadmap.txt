@@ -1,0 +1,108 @@
+Roadmap iterativo (alto nivel — sin fechas)
+
+Voy a numerar Iteración 0 → Iteración 6. Para cada una te doy: objetivo, entregables, qué vas a aprender y criterios de aceptación.
+
+Iteración 0 — Preparación / Exploración (POC mínimo preparatorio)
+
+Objetivo: Tener repo + entorno listo y una descarga / ingestión simple de 1 fuente (ej. RSS o arXiv) y almacenar el texto crudo.
+Entregables: repo con estructura mínima, README.md, script que descarga y guarda al menos 1 artículo/paper (archivo .md o .json).
+Aprenderás: manejo de entorno, ergonomía del repo, parsing básico de feeds/APIs, control de versiones.
+Criterios de aceptación: hay un repo con scripts reproducibles que al ejecutar python ingest.py --source arxiv guarda un documento con metadata (title, date, url, text).
+Ejercicios:
+
+Crear repo en GitHub (o local) con estructura sugerida (src/, data/, notebooks/, scripts/, requirements.txt).
+
+Configurar entorno (venv/conda) e instalar librerías básicas (ej. feedparser, requests, python-dotenv).
+
+Escribir ingest.py que consuma 1 feed (arXiv o RSS de blog) y guarde JSON en data/raw/.
+Qué me envías: link al repo o el ingest.py y el JSON guardado.
+
+Iteración 1 — Primer RAG PoC (very small)
+
+Objetivo: Implementar embedding + vector DB local simple + recuperar contexto y hacer una consulta simple al LLM (puede ser OpenAI o un stub).
+Entregables: script que: toma data/raw/ → chunking → embeddings → sube a Chroma (o una carpeta local que simule un index), y un query.py que recupera top-k chunks y arma prompt.
+Aprenderás: chunking, embeddings (concepto y uso), vector DB básico, diseño de prompt para RAG.
+Criterios de aceptación: al ejecutar python query.py "¿Qué hay nuevo sobre transformers?" el sistema devuelve una respuesta basada en el contenido indexado y cita la fuente.
+Ejercicios:
+
+Implementar chunker simple (p. ej. 800 tokens-ish con overlap).
+
+Integrar embeddings (OpenAI embeddings o alternativa local).
+
+Indexar en Chroma (puedes usar Chroma local para el PoC).
+
+Implementar query.py que: genera embedding de pregunta → busca top 10 → concatena contextos → llama al LLM con prompt template.
+Qué me envías: salida del query.py, el prompt generado y los top chunks.
+
+Iteración 2 — Ingesta multi-fuente y metadata (economía, historia, ai)
+
+Objetivo: Añadir varias fuentes (RSS de noticias, arXiv, DANE/Banco de la Rep. CSV) y normalizar metadata + versionado.
+Entregables: pipelines de ingest (scripts separados), metadata DB simple (sqlite/postgres), tags por categoría.
+Aprenderás: normalización, extracción de campos, ingest de series numéricas, mejores prácticas de metadata/provenance.
+Criterios de aceptación: puedes buscar por categoría (p. ej. “Colombia economía”) y obtener resultados que incluyan la fuente original y fecha.
+Ejercicios:
+
+Conectar 3 fuentes distintas.
+
+Añadir metadata: fuente, fecha, autor, idioma, categoría.
+
+Indexar CSV de series económicas y diseñar esquema de metadatos.
+Qué me envías: ejemplo de entrada normalizada (JSON) y query de búsqueda por categoría.
+
+Iteración 3 — Conversational UI mínima + prompts robustos
+
+Objetivo: Montar un endpoint (FastAPI) o script que simule la UI conversacional y mejore prompts (system/user) para control de hallucinations y cita.
+Entregables: endpoint /chat que recibe pregunta y devuelve respuesta + lista de fuentes consultadas y score de confianza.
+Aprenderás: diseño de prompts, control de temperatura, prompt templates, manejo de tokens/context window (fallbacks).
+Criterios de aceptación: chat responde con resumen corto + deep-dive + fuentes (url + excerpt).
+Ejercicios:
+
+Implementar FastAPI con ruta POST /chat.
+
+Construir prompt template con: instruction, context chunks (top-k), user question, and constraints (“use only given info” + cite).
+Qué me envías: ejemplo de request/response y el prompt final con contexto.
+
+Iteración 4 — Módulos temáticos (Economía-Colombia + Historia)
+
+Objetivo: Añadir carpetas de conocimiento / pipelines específicas: series temporales económicas y corpus histórico con metadata académica.
+Entregables: endpoints/handlers especializados (/econ/summary, /history/factoid) y plantillas de prompts específicas.
+Aprenderás: cómo diseñar “skills” o sub-agentes dentro del agente general, métricas económicas básicas y cómo estructurar preguntas históricas.
+Criterios de aceptación: /econ/summary?series=PIB&country=Colombia devuelve análisis con gráficos (o CSV) y /history/factoid?topic=Batalla de Boyacá devuelve 5 datos referenciados.
+Ejercicios:
+
+Implementar extractor de series y generar un gráfico simple (matplotlib).
+
+Crear prompt para “5 datos poco conocidos” sobre un suceso histórico.
+Qué me envías: outputs de ambos endpoints y el dataset usado.
+
+Iteración 5 — Evaluación, tests automatizados y feedback loop
+
+Objetivo: Implementar tests que detecten regresiones (hallucinations, freshness), pipeline de reindexado y mecanismo de feedback humano.
+Entregables: test suite (pytest) con checks: citations present, no invented dates, freshness < X (configurable), y UI simple para marcar ‘trusted’/‘reject’.
+Aprenderás: diseño de tests para LLM systems, cómo instrumentar calidad, creación de datasets de evaluación.
+Criterios de aceptación: la suite de tests pasa en CI; hay un proceso claro para reindexar cuando falla freshness.
+Ejercicios:
+
+Escribir 10 tests básicos sobre respuestas.
+
+Implementar endpoint para feedback humano que marque chunks como confiables/no confiables.
+Qué me envías: resultados de tests y ejemplos de feedback aplicado.
+
+Iteración 6 — Harden & Productionize
+
+Objetivo: Escalar vector DB (administrada si necesario), seguridad (secrets), observabilidad, despliegue (k8s o cloud), y cost control.
+Entregables: plan de infra con recomendaciones, Dockerfile, manifests básicos, y checklist de seguridad.
+Aprenderás: trade-offs de producción, costos, rate-limits, SLOs y cómo operacionalizar reentrenos/actualizaciones.
+Criterios de aceptación: existe Dockerfile + manifiesto básico + guía para desplegar en un entorno cloud (p.ej. GCP/AWS) y políticas de secrets + rotación.
+
+Métricas y pruebas que usaremos (para evaluar progreso)
+
+Coverage de fuentes por categoría.
+
+% de afirmaciones verificables (muestra humana).
+
+Freshness (tiempo entre publicación e ingest).
+
+Latencia de respuesta (RAG retrieval + LLM).
+
+Tasa de feedback humano (trusted/rejected).
