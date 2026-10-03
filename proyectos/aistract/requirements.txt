@@ -1,0 +1,9 @@
+PyMuPDF
+
+streamlit
+
+langchain
+langchain-openai
+openai
+
+tiktoken
